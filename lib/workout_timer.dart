@@ -26,7 +26,7 @@ class WorkoutTimer extends StatefulWidget {
 
 class _WorkoutTimerState extends State<WorkoutTimer> with SingleTickerProviderStateMixin {
 
-  final WorkoutData _workoutData = WorkoutData(totalCycles: 3, totalSets: 3, workout: Duration(seconds: 30),
+  final WorkoutData _workoutData = WorkoutData(totalCycles: 3, totalSets: 3, workout: Duration(seconds: 20),
   rest: Duration(seconds: 10));
   late TimerCallbacks _timerCallbacks;
 
@@ -64,7 +64,7 @@ class _WorkoutTimerState extends State<WorkoutTimer> with SingleTickerProviderSt
       // switch displayed timer between the set time and the rest time,
       // and update completed sets if setTime is finishing
       if(_countDown == Duration.zero){
-        if(_isSet){
+        if(!_isSet){
           _updateSets();
         }
         _toggleSetRest();
@@ -113,9 +113,11 @@ class _WorkoutTimerState extends State<WorkoutTimer> with SingleTickerProviderSt
       _ticker.stop();
     }
     setState(() {
-      _countDown = _isSet ? _workoutData.workout : _workoutData.rest;
+      _countDown =  _workoutData.workout;
       _toggleButtonLabel = 'Start';
       _timerCallbacks.reset = null;
+      _workoutData.currentSet = 1;
+      _workoutData.currentCycle = 1;
     });
   }
 
@@ -124,6 +126,8 @@ class _WorkoutTimerState extends State<WorkoutTimer> with SingleTickerProviderSt
       setState(() {
         _workoutData.currentSet++;
       });
+    } else if (_workoutData.currentSet == _workoutData.totalSets){
+      _updateCycles();
     }
   }
 
@@ -131,7 +135,10 @@ class _WorkoutTimerState extends State<WorkoutTimer> with SingleTickerProviderSt
     if(_workoutData.currentCycle < _workoutData.totalCycles){
       setState(() {
         _workoutData.currentCycle++;
+        _workoutData.currentSet = 1;
       });
+    } else if (_workoutData.currentCycle == _workoutData.totalCycles){
+      _resetTicker();
     }
   }
 
@@ -189,8 +196,8 @@ class _WorkoutTimerState extends State<WorkoutTimer> with SingleTickerProviderSt
 }
 
 class WorkoutData{
-  WorkoutData({this.totalSets = 0, this.currentSet = 0,
-    this.totalCycles = 0, this.currentCycle = 0,
+  WorkoutData({this.totalSets = 1, this.currentSet = 1,
+    this.totalCycles = 1, this.currentCycle = 1,
   required this.workout, required this.rest});
 
   int totalSets, currentSet, totalCycles, currentCycle;
