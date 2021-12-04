@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import './workout_timer.dart';
 
 class WorkoutStatus extends StatelessWidget {
   const WorkoutStatus({Key? key, required this.data}) : super(key: key);
@@ -49,7 +50,4 @@ class CyclesCounter extends StatelessWidget {
   }
 }
 
-class WorkoutData{
-  WorkoutData({this.totalSets = 0, this.currentSet = 0, this.totalCycles = 0, this.currentCycle = 0});
-  int totalSets, currentSet, totalCycles, currentCycle;
-}
+
