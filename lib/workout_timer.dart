@@ -45,8 +45,8 @@ class _WorkoutTimerState extends State<WorkoutTimer> with SingleTickerProviderSt
     _setTime = _workoutData.workout;
     _restTime = _workoutData.rest;
     _countDown = _setTime;
-    _timerCallbacks.reset = null;
-    _timerCallbacks.toggleTicker = _toggleTicker;
+    _timerCallbacks = TimerCallbacks(toggleTicker: _toggleTicker, reset: null);
+
     _ticker = createTicker(_tick);
   }
 
