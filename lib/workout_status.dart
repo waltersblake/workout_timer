@@ -23,12 +23,12 @@ class SetsCounter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(padding: const EdgeInsets.all(16),
+    return Padding(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
         child: Column(children: [
           Text('$currentSet of $totalSets',
           style: const TextStyle(fontSize: 20)),
           const Text('Sets',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),),
+            style: TextStyle(fontStyle: FontStyle.italic, fontWeight: FontWeight.bold, fontSize: 24),),
         ])
     );
 
@@ -42,10 +42,10 @@ class CyclesCounter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(padding: const EdgeInsets.all(16),
+    return Padding(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
     child: Column(children: [
       Text('$currentCycle of $totalCycles', style: const TextStyle(fontSize: 20)),
-      const Text('Cycles', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
+      const Text('Cycles', style: TextStyle(fontStyle: FontStyle.italic,fontWeight: FontWeight.bold, fontSize: 24)),
     ]));
   }
 }
