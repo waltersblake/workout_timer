@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import './workout_status.dart';
 import './timer.dart';
+import './settings.dart';
 
 typedef TickerCallback = void Function();
 typedef ResetCallback = void Function();
+typedef WorkoutDataCallback = void Function(WorkoutData);
 
 class WorkoutTimer extends StatefulWidget {
   const WorkoutTimer({Key? key, required this.title}) : super(key: key);
@@ -26,8 +28,7 @@ class WorkoutTimer extends StatefulWidget {
 
 class _WorkoutTimerState extends State<WorkoutTimer> with SingleTickerProviderStateMixin {
 
-  final WorkoutData _workoutData = WorkoutData(totalCycles: 3, totalSets: 3, workout: Duration(seconds: 20),
-  rest: Duration(seconds: 10));
+  WorkoutData _workoutData = WorkoutData();
   late TimerCallbacks _timerCallbacks;
 
   late final Ticker _ticker;
@@ -142,6 +143,28 @@ class _WorkoutTimerState extends State<WorkoutTimer> with SingleTickerProviderSt
     }
   }
 
+  void _pushSettings(){
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context){
+          return Settings(data: _workoutData,
+            onSettingsUpdate: _updateWorkoutData,);
+        }
+    ,
+      )
+    );
+  }
+
+  void _updateWorkoutData(WorkoutData d){
+        debugPrint('Update workout settings here');
+        setState(() {
+          _workoutData = d;
+          _setTime = _workoutData.workout;
+          _restTime = _workoutData.rest;
+          _countDown = _setTime;
+        });
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -156,25 +179,12 @@ class _WorkoutTimerState extends State<WorkoutTimer> with SingleTickerProviderSt
         // Here we take the value from the WorkoutTimer object that was created by
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
+        actions: [
+          IconButton(onPressed: _pushSettings, icon: const Icon(Icons.settings))
+        ],
       ),
       body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
         child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
             WorkoutStatus(data: _workoutData),
@@ -185,12 +195,6 @@ class _WorkoutTimerState extends State<WorkoutTimer> with SingleTickerProviderSt
           ],
         ),
       ),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: _incrementCounter,
-      //   tooltip: 'Increment',
-      //   child: const Icon(Icons.add),
-      // ),
-      // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
@@ -198,7 +202,7 @@ class _WorkoutTimerState extends State<WorkoutTimer> with SingleTickerProviderSt
 class WorkoutData{
   WorkoutData({this.totalSets = 1, this.currentSet = 1,
     this.totalCycles = 1, this.currentCycle = 1,
-  required this.workout, required this.rest});
+  this.workout = const Duration(seconds: 30), this.rest = const Duration(seconds:10)});
 
   int totalSets, currentSet, totalCycles, currentCycle;
   Duration workout, rest;
