@@ -11,15 +11,6 @@ typedef WorkoutDataCallback = void Function(WorkoutData);
 class WorkoutTimer extends StatefulWidget {
   const WorkoutTimer({Key? key, required this.title}) : super(key: key);
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
   final String title;
 
   @override
@@ -27,7 +18,6 @@ class WorkoutTimer extends StatefulWidget {
 }
 
 class _WorkoutTimerState extends State<WorkoutTimer> with SingleTickerProviderStateMixin {
-
   WorkoutData _workoutData = WorkoutData();
   late TimerCallbacks _timerCallbacks;
 
@@ -57,15 +47,15 @@ class _WorkoutTimerState extends State<WorkoutTimer> with SingleTickerProviderSt
     super.dispose();
   }
 
-  void _tick(Duration elapsed){
+  void _tick(Duration elapsed) {
     // ticker ticks with the screen rate, 60fps.
     // since we only care about seconds, set the state once every 60 frames.
-    if(_count == 60){
+    if (_count == 60) {
       _count = 0;
       // switch displayed timer between the set time and the rest time,
       // and update completed sets if setTime is finishing
-      if(_countDown == Duration.zero){
-        if(!_isSet){
+      if (_countDown == Duration.zero) {
+        if (!_isSet) {
           _updateSets();
         }
         _toggleSetRest();
@@ -78,11 +68,11 @@ class _WorkoutTimerState extends State<WorkoutTimer> with SingleTickerProviderSt
     } else {
       _count++;
     }
-
   }
 
-  void _toggleSetRest(){
-    if(_isSet){
+  // Switch between the workout time and the rest time once a set is finished
+  void _toggleSetRest() {
+    if (_isSet) {
       setState(() {
         _countDown = _restTime;
       });
@@ -94,8 +84,9 @@ class _WorkoutTimerState extends State<WorkoutTimer> with SingleTickerProviderSt
     _isSet = !_isSet;
   }
 
+  // Start/stop the ticker and update the Start/Pause button
   void _toggleTicker() {
-    if(_ticker.isActive){
+    if (_ticker.isActive) {
       _ticker.stop();
       setState(() {
         _toggleButtonLabel = 'Start';
@@ -109,12 +100,13 @@ class _WorkoutTimerState extends State<WorkoutTimer> with SingleTickerProviderSt
     }
   }
 
+  // Reset the workout
   void _resetTicker() {
     if (_ticker.isActive) {
       _ticker.stop();
     }
     setState(() {
-      _countDown =  _workoutData.workout;
+      _countDown = _workoutData.workout;
       _toggleButtonLabel = 'Start';
       _timerCallbacks.reset = null;
       _workoutData.currentSet = 1;
@@ -122,66 +114,61 @@ class _WorkoutTimerState extends State<WorkoutTimer> with SingleTickerProviderSt
     });
   }
 
-  void _updateSets(){
-    if(_workoutData.currentSet < _workoutData.totalSets){
+  // Update completed sets and cycles
+
+  void _updateSets() {
+    if (_workoutData.currentSet < _workoutData.totalSets) {
       setState(() {
         _workoutData.currentSet++;
       });
-    } else if (_workoutData.currentSet == _workoutData.totalSets){
+    } else if (_workoutData.currentSet == _workoutData.totalSets) {
       _updateCycles();
     }
   }
 
-  void _updateCycles(){
-    if(_workoutData.currentCycle < _workoutData.totalCycles){
+  void _updateCycles() {
+    if (_workoutData.currentCycle < _workoutData.totalCycles) {
       setState(() {
         _workoutData.currentCycle++;
         _workoutData.currentSet = 1;
       });
-    } else if (_workoutData.currentCycle == _workoutData.totalCycles){
+    } else if (_workoutData.currentCycle == _workoutData.totalCycles) {
       _resetTicker();
     }
   }
 
-  void _pushSettings(){
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (BuildContext context){
-          return Settings(data: _workoutData,
-            onSettingsUpdate: _updateWorkoutData,);
-        }
-    ,
-      )
-    );
+  // Add the settings widget to the navigator stack so it is displayed on screen
+  void _pushSettings() {
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (BuildContext context) {
+        return Settings(
+          data: _workoutData,
+          onSettingsUpdate: _updateWorkoutData,
+        );
+      },
+    ));
   }
 
-  void _updateWorkoutData(WorkoutData d){
-        debugPrint('Update workout settings here');
-        setState(() {
-          _workoutData = d;
-          _setTime = _workoutData.workout;
-          _restTime = _workoutData.rest;
-          _countDown = _setTime;
-        });
+  // Callback for the settings widgets to update the workout data
+  void _updateWorkoutData(WorkoutData d) {
+    debugPrint('Workout settings updated');
+    setState(() {
+      _workoutData = d;
+      _setTime = _workoutData.workout;
+      _restTime = _workoutData.rest;
+      _countDown = _setTime;
+    });
   }
-
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
         // Here we take the value from the WorkoutTimer object that was created by
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
-        actions: [
-          IconButton(onPressed: _pushSettings, icon: const Icon(Icons.settings))
-        ],
+        // Add settings button to appbar
+        actions: [IconButton(onPressed: _pushSettings, icon: const Icon(Icons.settings))],
       ),
       body: Center(
         child: Column(
@@ -189,8 +176,11 @@ class _WorkoutTimerState extends State<WorkoutTimer> with SingleTickerProviderSt
           children: <Widget>[
             WorkoutStatus(data: _workoutData),
             const Spacer(),
-            TimerDisplay(data: _timerCallbacks, timerLabel: _countDown,
-              buttonLabel: _toggleButtonLabel,),
+            TimerDisplay(
+              data: _timerCallbacks,
+              timerLabel: _countDown,
+              buttonLabel: _toggleButtonLabel,
+            ),
             const Spacer(),
           ],
         ),
@@ -199,10 +189,15 @@ class _WorkoutTimerState extends State<WorkoutTimer> with SingleTickerProviderSt
   }
 }
 
-class WorkoutData{
-  WorkoutData({this.totalSets = 1, this.currentSet = 1,
-    this.totalCycles = 1, this.currentCycle = 1,
-  this.workout = const Duration(seconds: 30), this.rest = const Duration(seconds:10)});
+// POJO for relevant workout data
+class WorkoutData {
+  WorkoutData(
+      {this.totalSets = 1,
+      this.currentSet = 1,
+      this.totalCycles = 1,
+      this.currentCycle = 1,
+      this.workout = const Duration(seconds: 30),
+      this.rest = const Duration(seconds: 10)});
 
   int totalSets, currentSet, totalCycles, currentCycle;
   Duration workout, rest;
