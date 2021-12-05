@@ -189,9 +189,9 @@ class _WorkoutTimerState extends State<WorkoutTimer> with SingleTickerProviderSt
           children: <Widget>[
             WorkoutStatus(data: _workoutData),
             const Spacer(),
-            TimerDisplay(data: _timerCallbacks, timerLabel: _countDown.toString(),
+            TimerDisplay(data: _timerCallbacks, timerLabel: _countDown,
               buttonLabel: _toggleButtonLabel,),
-            const Spacer(flex: 2),
+            const Spacer(),
           ],
         ),
       ),
