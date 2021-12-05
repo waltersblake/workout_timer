@@ -25,8 +25,8 @@ class _WorkoutTimerState extends State<WorkoutTimer> with SingleTickerProviderSt
   late Duration _setTime;
   late Duration _restTime;
   late Duration _countDown;
-  final Duration _second = const Duration(seconds: 1);
-  String _toggleButtonLabel = 'Start';
+  final _second = const Duration(seconds: 1);
+  var _toggleButtonLabel = 'Start';
   var _count = 0;
   var _isSet = true;
 
@@ -37,7 +37,6 @@ class _WorkoutTimerState extends State<WorkoutTimer> with SingleTickerProviderSt
     _restTime = _workoutData.rest;
     _countDown = _setTime;
     _timerCallbacks = TimerCallbacks(toggleTicker: _toggleTicker, reset: null);
-
     _ticker = createTicker(_tick);
   }
 
@@ -180,6 +179,7 @@ class _WorkoutTimerState extends State<WorkoutTimer> with SingleTickerProviderSt
               data: _timerCallbacks,
               timerLabel: _countDown,
               buttonLabel: _toggleButtonLabel,
+              isSet: _isSet,
             ),
             const Spacer(),
           ],
