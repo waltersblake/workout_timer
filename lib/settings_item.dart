@@ -1,82 +1,56 @@
 import 'package:flutter/material.dart';
+import './settings.dart';
 
-// Copyright 2019 The Flutter team. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
+class SettingsListItem extends StatefulWidget {
+  const SettingsListItem({Key? key,required this.name, required this.icon,
+  required this.onValueChanged, required this.wkType, required this.initialValue}) : super(key: key);
 
-i
-
-// This entire list item is a PopupMenuButton. Tapping anywhere shows
-// a menu whose current value is highlighted and aligned over the
-// list item's center line.
-class _SimpleMenuDemo extends StatefulWidget {
-  const _SimpleMenuDemo({Key key, this.showInSnackBar}) : super(key: key);
-
-  final void Function(String value) showInSnackBar;
+  final String name;
+  final IconData icon;
+  final SettingsItemCallback onValueChanged;
+  final WorkoutItemType wkType;
+  final int initialValue;
 
   @override
-  _SimpleMenuDemoState createState() => _SimpleMenuDemoState();
+  State<SettingsListItem> createState() => _SettingsListItemState();
 }
 
-class _SimpleMenuDemoState extends State<_SimpleMenuDemo> {
-  SimpleValue _simpleValue;
+class _SettingsListItemState extends State<SettingsListItem> {
+  late int _value;
+  final List<PopupMenuItem<int>> _itemList = [];
 
-  void showAndSetMenuSelection(BuildContext context, SimpleValue value) {
+  void setSelectedValue(BuildContext context, int value) {
     setState(() {
-      _simpleValue = value;
+      _value = value;
+      widget.onValueChanged(widget.wkType, value);
     });
-    widget.showInSnackBar(
-      GalleryLocalizations.of(context)
-          .demoMenuSelected(simpleValueToString(context, value)),
-    );
   }
 
-  String simpleValueToString(BuildContext context, SimpleValue value) => {
-    SimpleValue.one: GalleryLocalizations.of(context).demoMenuItemValueOne,
-    SimpleValue.two: GalleryLocalizations.of(context).demoMenuItemValueTwo,
-    SimpleValue.three:
-    GalleryLocalizations.of(context).demoMenuItemValueThree,
-  }[value];
+  int? get value {
+    return _value;
+  }
 
   @override
   void initState() {
     super.initState();
-    _simpleValue = SimpleValue.two;
+    _value = widget.initialValue;
+    for(var i = 1; i < 60; i++){
+      _itemList.add(PopupMenuItem<int>(value: i,
+          child: Text(i.toString())));
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return PopupMenuButton<SimpleValue>(
+    return PopupMenuButton<int>(
       padding: EdgeInsets.zero,
-      initialValue: _simpleValue,
-      onSelected: (value) => showAndSetMenuSelection(context, value),
-      itemBuilder: (context) => <PopupMenuItem<SimpleValue>>[
-        PopupMenuItem<SimpleValue>(
-          value: SimpleValue.one,
-          child: Text(simpleValueToString(
-            context,
-            SimpleValue.one,
-          )),
-        ),
-        PopupMenuItem<SimpleValue>(
-          value: SimpleValue.two,
-          child: Text(simpleValueToString(
-            context,
-            SimpleValue.two,
-          )),
-        ),
-        PopupMenuItem<SimpleValue>(
-          value: SimpleValue.three,
-          child: Text(simpleValueToString(
-            context,
-            SimpleValue.three,
-          )),
-        ),
-      ],
+      initialValue: _value,
+      onSelected: (value) => setSelectedValue(context, value),
+      itemBuilder: (context) => _itemList,
       child: ListTile(
-        title: Text(
-            GalleryLocalizations.of(context).demoMenuAnItemWithASimpleMenu),
-        subtitle: Text(simpleValueToString(context, _simpleValue)),
+        leading: Icon(widget.icon),
+        title: Text(widget.name),
+        subtitle: Text(_value.toString()),
       ),
     );
   }
