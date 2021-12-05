@@ -8,17 +8,28 @@ class TimerDisplay extends StatelessWidget {
     required this.buttonLabel}) : super(key: key);
 
   final TimerCallbacks data;
-  final String timerLabel;
+  final Duration timerLabel;
   final String buttonLabel;
+
+  String _formatDuration(Duration d){
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    //String hours = twoDigits(d.inHours);
+    String minutes = twoDigits(d.inMinutes.remainder(60));
+    String seconds = twoDigits(d.inSeconds.remainder(60));
+    return '$minutes:$seconds';
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(padding: const EdgeInsets.all(16),
+    return Padding(padding: const EdgeInsets.symmetric(horizontal: 16,
+    vertical: 80),
         child: Column(
           children: [
-            Text(timerLabel),
+            Text(_formatDuration(timerLabel), style: const TextStyle(
+              fontSize: 70, fontWeight: FontWeight.bold
+            ),),
             const SizedBox(width: 0,
-              height: 90,),
+              height: 165,),
             TimerButtons(onToggle: data.toggleTicker, onReset: data.reset, label: buttonLabel),
           ],
         ));
